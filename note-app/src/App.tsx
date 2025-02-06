@@ -106,8 +106,8 @@ function App() {
             <NoteList
               notes={notesWithTags}
               availableTags={tags}
-              updateTag={updateTag}
-              deleteTag={deleteTag}
+              onUpdateTag={updateTag}
+              onDeleteTag={deleteTag}
             />
           }
         />
