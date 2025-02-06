@@ -19,7 +19,7 @@ export function Note({onDelete}: NoteProps) {
           {note.tags.length > 0 && (
             <Stack gap={1} direction="horizontal" className="flex-wrap">
               {note.tags.map((tag) => (
-                <Badge className="text-truncate" key={tag.id}>
+                <Badge key={tag.id} className="text-truncate" >
                   {tag.label}
                 </Badge>
               ))}

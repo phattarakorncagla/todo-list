@@ -49,7 +49,7 @@ export function NoteList({
     return notes.filter((note) => {
       return (
         (title === "" ||
-          note.title.toLowerCase().includes(title.toLocaleLowerCase())) &&
+          note.title.toLowerCase().includes(title.toLowerCase())) &&
         (selectedTags.length === 0 ||
           selectedTags.every((tag) =>
             note.tags.some((noteTag) => noteTag.id === tag.id)
