@@ -4,12 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
 type NoteProps = {
-    onDelete: (id:string) => void
-}
+  onDelete: (id: string) => void;
+  onDeleteTag: (id: string) => void;
+};
 
-export function Note({onDelete}: NoteProps) {
+export function Note({ onDelete, onDeleteTag }: NoteProps) {
   const note = useNote();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <>
@@ -19,7 +20,7 @@ export function Note({onDelete}: NoteProps) {
           {note.tags.length > 0 && (
             <Stack gap={1} direction="horizontal" className="flex-wrap">
               {note.tags.map((tag) => (
-                <Badge key={tag.id} className="text-truncate" >
+                <Badge className="text-truncate" key={tag.id}>
                   {tag.label}
                 </Badge>
               ))}
@@ -31,12 +32,27 @@ export function Note({onDelete}: NoteProps) {
             <Link to={`/${note.id}/edit`}>
               <Button variant="primary">Edit</Button>
             </Link>
-            <Button onClick={() => {
-                onDelete(note.id)
-                navigate("/")
-            }} variant="outline-danger">Delete</Button>
+            <Button
+              onClick={() => {
+                onDelete(note.id);
+                navigate("/");
+              }}
+              variant="outline-danger"
+            >
+              Delete
+            </Button>
+            <Button
+              onClick={() => {
+                onDelete(note.id); 
+                note.tags.forEach(tag => onDeleteTag(tag.id));
+                navigate("/");
+              }}
+              variant="outline-danger"
+            >
+              Delete Note with Tag(s)
+            </Button>
             <Link to={"/"}>
-                <Button variant="outline-secondary">Back</Button>
+              <Button variant="outline-secondary">Back</Button>
             </Link>
           </Stack>
         </Col>

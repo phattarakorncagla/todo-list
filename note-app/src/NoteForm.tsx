@@ -7,7 +7,7 @@ import { v4 as uuidV4 } from "uuid";
 
 type NoteFormProps = {
   onSubmit: (data: NoteData) => void;
-  onAddTag: (tag: Tag) => void;
+  onAddTag: (tag: Tag) => Promise<Tag | null>;
   availableTags: Tag[];
 } & Partial<NoteData>;
 
@@ -23,6 +23,14 @@ export function NoteForm({
   const markdownRef = useRef<HTMLTextAreaElement>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags);
   const navigate = useNavigate();
+
+  async function handleCreateOption(label: string) {
+    const newTag = await onAddTag({ id: uuidV4(), label });
+    if (newTag) {
+      setSelectedTags((prev) => [...prev, newTag]);
+    }
+  }
+
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -50,11 +58,7 @@ export function NoteForm({
             <Form.Group controlId="tags">
               <Form.Label>Tags</Form.Label>
               <CreatableReactSelect
-                onCreateOption={(label) => {
-                  const newTag = { id: uuidV4(), label };
-                  onAddTag(newTag);
-                  setSelectedTags((prev) => [...prev, newTag]);
-                }}
+                onCreateOption={handleCreateOption}
                 value={selectedTags.map((tag) => {
                   return { label: tag.label, value: tag.id };
                 })}

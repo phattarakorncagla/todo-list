@@ -25,6 +25,7 @@ type NoteListProps = {
   notes: SimplifiedNote[];
   onDeleteTag: (id: string) => void;
   onUpdateTag: (id: string, label: string) => void;
+  onDeleteNote: (id: string) => void;
 };
 
 type EditTagsModalProps = {
@@ -40,6 +41,7 @@ export function NoteList({
   notes,
   onUpdateTag,
   onDeleteTag,
+  onDeleteNote,
 }: NoteListProps) {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [title, setTitle] = useState("");
@@ -116,7 +118,13 @@ export function NoteList({
       <Row xs={1} sm={2} lg={3} xl={4} className="g-3">
         {filteredNotes.map((note) => (
           <Col key={note.id}>
-            <NoteCard id={note.id} title={note.title} tags={note.tags} />
+            <NoteCard
+              id={note.id}
+              title={note.title}
+              tags={note.tags}
+              onDeleteNote={onDeleteNote}
+              onDeleteTag={onDeleteTag}
+            />
           </Col>
         ))}
       </Row>
@@ -131,7 +139,15 @@ export function NoteList({
   );
 }
 
-function NoteCard({ id, title, tags }: SimplifiedNote) {
+function NoteCard({
+  id,
+  title,
+  tags,
+  onDeleteNote,
+  onDeleteTag,
+}: SimplifiedNote & { onDeleteNote: (id: string) => void } & {
+  onDeleteTag: (id: string) => void;
+}) {
   return (
     <Card
       as={Link}
@@ -157,6 +173,23 @@ function NoteCard({ id, title, tags }: SimplifiedNote) {
               ))}
             </Stack>
           )}
+          <Col>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              className="me-2"
+              onClick={() => onDeleteNote(id)}
+            >
+              Delete Note
+            </Button>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => (onDeleteNote(id),tags.forEach(tag => onDeleteTag(tag.id)))}
+            >
+              Delete Note with Tag(s)
+            </Button>
+          </Col>
         </Stack>
       </Card.Body>
     </Card>

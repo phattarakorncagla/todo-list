@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const connection = require("../db");
-const { v4: uuidV4 } = require("uuid");
 
 router.get("/", (req, res) => {
   connection.query("SELECT * FROM notes", (err, results) => {
@@ -14,8 +13,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  const { title, markdown, tagIds } = req.body;
-  const id = uuidV4();
+  const {id, title, markdown, tagIds } = req.body;
   connection.query(
     "INSERT INTO notes (id, title, markdown, tagIds) VALUES (?, ?, ?, ?)",
     [id, title, markdown, JSON.stringify(tagIds)],
@@ -24,7 +22,7 @@ router.post("/", (req, res) => {
         res.status(500).send("Error creating note");
         return;
       }
-      res.status(201).send("Note created");
+      res.status(201).send({ id, title, markdown, tagIds });
     }
   );
 });

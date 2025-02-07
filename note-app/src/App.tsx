@@ -8,6 +8,7 @@ import { NoteLayout } from "./NoteLayout";
 import { Note } from "./Note";
 import { EditNote } from "./EditNote";
 import axios from "axios";
+import { v4 as uuidV4 } from 'uuid';
 
 export type Note = {
   id: string;
@@ -58,15 +59,11 @@ function App() {
   }, [notes, tags]);
 
   async function onCreateNote({ tags, ...data }: NoteData) {
-    const response = await axios.post("http://localhost:3000/notes", {
-      ...data,
-      tagIds: tags.map((tag) => tag.id),
-    });
+    const newNote = { ...data, id: uuidV4(), tagIds: tags.map((tag) => tag.id) };
+    const response = await axios.post("http://localhost:3000/notes", newNote);
   
     if (response.status === 201) {
-      const newNote = response.data;
-      console.log("New note created:", newNote);
-      setNotes((prevNotes) => [...prevNotes, newNote]);
+      setNotes((prevNotes) => [...prevNotes, response.data]);
     }
   }
 
@@ -75,7 +72,7 @@ function App() {
       ...data,
       tagIds: tags.map((tag) => tag.id),
     });
-  
+
     if (response.status === 200) {
       setNotes((prevNotes) => {
         return prevNotes.map((note) => {
@@ -100,16 +97,14 @@ function App() {
   }
 
   async function addTag(tag: Tag) {
-    const response = await axios.post("http://localhost:3000/tags", {
-      ...tag,
-      label: String(tag.label),
-    });
+    const newTag = { ...tag, id: uuidV4() };
+    const response = await axios.post("http://localhost:3000/tags", newTag);
   
     if (response.status === 201) {
-      const newTag = response.data;
-      console.log("New tag created:", newTag);
-      setTags((prev) => [...prev, newTag]);
+      setTags((prevTags) => [...prevTags, newTag]);
+      return newTag;
     }
+    return null;
   }
 
   async function updateTag(id: string, label: string) {
@@ -151,6 +146,7 @@ function App() {
               availableTags={tags}
               onUpdateTag={updateTag}
               onDeleteTag={deleteTag}
+              onDeleteNote={onDeleteNote}
             />
           }
         />
@@ -165,7 +161,7 @@ function App() {
           }
         />
         <Route path="/:id" element={<NoteLayout notes={notesWithTags} />}>
-          <Route index element={<Note onDelete={onDeleteNote} />} />
+          <Route index element={<Note onDelete={onDeleteNote} onDeleteTag={deleteTag}/>} />
           <Route
             path="edit"
             element={
